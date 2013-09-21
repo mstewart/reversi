@@ -1,4 +1,21 @@
 <html>
+  <head>
+    <style>
+      .board{
+        width: 40%;
+      }
+
+      .tile{
+        width: 12.5%;
+        background-color: grey;
+      }
+
+      .piece{
+        width: 90%;
+        height: 90%;
+      }
+    </style>
+  </head>
   <body>
 
     <script type="text/javascript">
@@ -19,6 +36,13 @@
       var is_legal_move(current_board, tile) {
       }
     </script>
-  
+
+    <div id="board">
+
+      <div class="tile">
+        <div class="piece"></div>
+      </div>
+
+    </div>
   </body>
 </html>
