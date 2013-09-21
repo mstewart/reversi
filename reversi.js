@@ -85,6 +85,16 @@
     current_board[tile] = capturing_colour;
   };
 
+  var dump_board = function(board) {
+    for(y=0; y < board.width; ++y) {
+      var row = [];
+      for(x=0; x < board.width; ++x) {
+        row.push(board[vector(x,y)]);
+      }
+      console.log("-- " + row.join(' '));
+    }
+  };
+
   var init_board = function(n) {
     var board = {};
     for(var x=0; x < n; ++x) {
@@ -101,21 +111,19 @@
     board[vector(floor(n/2),      floor(n/2))]      = TILESTATE.WHITE;
 
     board.width = n;
+    board.is_legal_move = _.partial(is_legal_move, board);
+    board.take_move = _.partial(take_move, board);
+    board.captured_pieces = _.partial(captured_pieces, board);
+    board.dump = _.partial(dump_board, board);
+
     return board;
   };
 
   window.board = init_board(8);
-
-  var dump_board = function(board) {
-    for(y=0; y < board.width; ++y) {
-      var row = [];
-      for(x=0; x < board.width; ++x) {
-        row.push(board[vector(x,y)]);
-      }
-      console.log("-- " + row.join(' '));
-    }
-  };
+  window.vector = vector;
+  window.TILESTATE = TILESTATE;
 
   dump_board(window.board);
 })();
+
 
