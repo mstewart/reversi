@@ -16,9 +16,11 @@
       }
     </style>
   </head>
-  <body>
+
+    <script type="text/javascript" charset="utf-8" src="http://underscorejs.org/underscore.js"></script>
 
     <script type="text/javascript">
+    (function() {
       var TILESTATE = {
         EMPTY: 0,
         WHITE: 1,
@@ -69,7 +71,7 @@
             traversed_tiles.push(current_tile);
             current_tile = current_tile.plus(delta);
           }
-        }
+        };
 
         var deltas = [];
         [-1,0,1].forEach(function(x) {
@@ -84,7 +86,7 @@
       };
 
       /** A move is legal if the tile is empty, and a capture would result. */
-      var is_legal_move(current_board, tile, capturing_colour) {
+      var is_legal_move = function(current_board, tile, capturing_colour) {
         return (current_board[tile] == TILESTATE.EMPTY) &&
                _.any(captured_pieces(current_board, tile, capturing_colour));
       };
@@ -93,7 +95,7 @@
         Mutates the game board object, returning it back.
         Throws an exception if this is an illegal move.
       */
-      var take_move(current_board, tile, capturing_colour) {
+      var take_move = function(current_board, tile, capturing_colour) {
         if (! is_legal_move(current_board, tile, capturing_colour)) {
           throw "Illegal move at " + tile;
         }
@@ -103,8 +105,43 @@
         });
         current_board[tile] = capturing_colour;
       };
+
+      var init_board = function(n) {
+        var board = {};
+        for(var x=0; x < n; ++x) {
+          for(var y=0; y < n; ++y) {
+            board[vector(x,y)] = TILESTATE.EMPTY;
+          }
+        }
+
+        // Init middle guys.
+        var floor = Math.floor;
+        board[vector(floor(n/2) - 1,  floor(n/2) - 1)]  = TILESTATE.WHITE;
+        board[vector(floor(n/2) - 1,  floor(n/2))]      = TILESTATE.BLACK;
+        board[vector(floor(n/2),      floor(n/2) - 1)]  = TILESTATE.BLACK;
+        board[vector(floor(n/2),      floor(n/2))]      = TILESTATE.WHITE;
+
+        board.width = n;
+        return board;
+      };
+
+      window.board = init_board(8);
+
+      var dump_board = function(board) {
+        for(y=0; y < board.width; ++y) {
+          var row = [];
+          for(x=0; x < board.width; ++x) {
+            row.push(board[vector(x,y)]);
+          }
+          console.log("-- " + row.join(' '));
+        }
+      };
+
+      dump_board(window.board);
+    })();
     </script>
 
+  <body>
     <div id="board">
 
       <div class="tile">
