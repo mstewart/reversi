@@ -1,0 +1,4 @@
+reversi
+=======
+
+Reversi JS game.
