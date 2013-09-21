@@ -1,3 +1,24 @@
+/**
+ * Reversi game.
+ *
+ * Exposes the following types:
+ *
+ *  vector: A 2D vector type. Construct an instance with e.g. vector(3,4).
+ *      These are used to identify tiles on the game grid.
+ *
+ *  TILESTATE: An enum of 3 different values,
+ *      TILESTATE.WHITE,
+ *      TILESTATE.BLACK,
+ *      TILESTATE.EMPTY.
+ *    
+ *  board: A map of vector -> TILESTATE, with the following extra methods:
+ *      is_legal_move(position, moving_colour) :: (vector, TILESTATE) -> boolean
+ *          Determine whether a move to a location is legal.
+ *
+ *      take_move(position, moving_colour) :: (vector, TILESTATE) -> void
+ *          Update the board with the given move (raises error if illegal).
+ *          Modifies the board objects itself.
+ */
 
 (function() {
   var TILESTATE = {
@@ -119,11 +140,9 @@
     return board;
   };
 
-  window.board = init_board(8);
+  window.board = init_board;
   window.vector = vector;
   window.TILESTATE = TILESTATE;
-
-  dump_board(window.board);
 })();
 
-
+window.board(8).dump();
