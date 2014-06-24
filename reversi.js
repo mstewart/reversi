@@ -15,9 +15,9 @@
  *      is_legal_move(position, moving_colour) :: (vector, TILESTATE) -> boolean
  *          Determine whether a move to a location is legal.
  *
- *      take_move(position, moving_colour) :: (vector, TILESTATE) -> void
+ *      take_move(position, moving_colour) :: (vector, TILESTATE) -> board
  *          Update the board with the given move (raises error if illegal).
- *          Modifies the board objects itself.
+ *          Modifies the board object, and returns it back again for convenience.
  */
 
 (function() {
@@ -41,35 +41,33 @@
     };
   };
 
-  // Thought: the tuple of (current_board, new_tile, capturing_colour)
-  // gets passed around together a lot.
-  // It would be natural to group these together into a combined "Move" object.
-
   /** The list of pieces which would be captured by a given move.
     Board, vector, tile_state -> [vector].
     Non-mutating.
   */
   var captured_pieces = function(current_board,
-      new_tile,
+      new_piece_position,
       capturing_colour)
   {
     // Walk in each direction as far as possible until hitting
     // either an empty space, or a piece of the same colour.
     // If the same colour, the intermediates would be captured.
     var captured_pieces_in_direction = function(delta) {
-      var current_tile = new_tile;
+      var current_position = new_piece_position.plus(delta);
       var traversed_tiles = [];
 
       while (true) {
-        if (! current_tile in current_board ||
-            current_board[current_tile] == TILESTATE.EMPTY) {
+        if (! _.has(current_board, current_position)) {
           return [];
         }
-        if (current_board[current_tile] == capturing_colour) {
+        if (current_board[current_position] == TILESTATE.EMPTY) {
+          return [];
+        }
+        if (current_board[current_position] == capturing_colour) {
           return traversed_tiles;
         }
-        traversed_tiles.push(current_tile);
-        current_tile = current_tile.plus(delta);
+        traversed_tiles.push(current_position);
+        current_position = current_position.plus(delta);
       }
     };
 
@@ -82,7 +80,8 @@
         });
     });
 
-    return _.union(_.map(deltas, captured_pieces_in_direction));
+    return _.union(_,
+            _.map(deltas, captured_pieces_in_direction));
   };
 
   /** A move is legal if the tile is empty, and a capture would result. */
@@ -96,17 +95,20 @@
     Throws an exception if this is an illegal move.
   */
   var take_move = function(current_board, tile, capturing_colour) {
+    console.log("Moving to position " + tile + " with colour " + capturing_colour);
     if (! is_legal_move(current_board, tile, capturing_colour)) {
-      throw "Illegal move at " + tile;
+      throw "Illegal move at " + tile + " with colour " + capturing_colour;
     }
 
     _.each(captured_pieces(current_board, tile, capturing_colour), function(piece) {
         current_board[piece] = capturing_colour;
     });
     current_board[tile] = capturing_colour;
+    return current_board;
   };
 
   var dump_board = function(board) {
+    console.log("Dumping board:");
     for(y=0; y < board.width; ++y) {
       var row = [];
       for(x=0; x < board.width; ++x) {
@@ -132,10 +134,10 @@
     board[vector(floor(n/2),      floor(n/2))]      = TILESTATE.WHITE;
 
     board.width = n;
-    board.is_legal_move = _.partial(is_legal_move, board);
-    board.take_move = _.partial(take_move, board);
-    board.captured_pieces = _.partial(captured_pieces, board);
-    board.dump = _.partial(dump_board, board);
+    board.is_legal_move     = _.partial(is_legal_move, board);
+    board.take_move         = _.partial(take_move, board);
+    board.captured_pieces   = _.partial(captured_pieces, board);
+    board.dump              = _.partial(dump_board, board);
 
     return board;
   };
@@ -145,4 +147,11 @@
   window.TILESTATE = TILESTATE;
 })();
 
-window.board(8).dump();
+debugboard = window.board(8);
+debugboard.dump();
+
+debugboard.take_move(
+        vector(2,4),
+        TILESTATE.WHITE
+    ).dump();
+
