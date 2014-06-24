@@ -32,8 +32,8 @@
     return {
       x: x,
       y: y,
-      plus: function(v1,v2) {
-        return vector(v1.x + v2.x, v1.y + v2.y);
+      plus: function(v) {
+        return vector(v.x + x, v.y + y);
       },
       toString: function() {
         return "("+x+","+y+")";
